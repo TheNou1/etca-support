@@ -4,7 +4,7 @@
   "description": "A Language support extension for the ETCA assembly language. https://github.com/ETC-A/etca-spec/blob/main/base-isa.md",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.109.0"
+    "vscode": "^1.103.0"
   },
   "categories": [
     "Other"
