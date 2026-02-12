@@ -1,0 +1,85 @@
+{
+  "scopeName": "source.etca",
+  "name": "ETCA",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#labels" },
+    { "include": "#instructions" },
+    { "include": "#registers" },
+    { "include": "#controlRegisters" },
+    { "include": "#flags" },
+    { "include": "#numbers" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.semicolon.etca",
+          "match": ";.*$"
+        }
+      ]
+    },
+
+    "labels": {
+      "patterns": [
+        {
+          "name": "entity.name.label.etca",
+          "match": "^[A-Za-z_][A-Za-z0-9_]*:"
+        }
+      ]
+    },
+
+    "instructions": {
+      "patterns": [
+        {
+          "name": "keyword.instruction.computation.etca",
+          "match": "\\b(?i:ADD|SUB|RSUB|CMP|OR|XOR|AND|TEST|MOVZ|MOV|MOVS|LOAD|STORE|SLO|READCR|WRITECR)\\b"
+        },
+        {
+          "name": "keyword.instruction.jump.etca",
+          "match": "\\b(?i:JZ|JNZ|JN|JNN|JC|JNC|JV|JNV|JBE|JA|JL|JGE|JLE|JG|JMP|JNEVER)\\b"
+        }
+      ]
+    },
+
+    "registers": {
+      "patterns": [
+        {
+          "name": "variable.register.etca",
+          "match": "\\bR[0-7]\\b"
+        }
+      ]
+    },
+
+    "controlRegisters": {
+      "patterns": [
+        {
+          "name": "constant.language.controlregister.etca",
+          "match": "\\b(CPUID1|CPUID2|FEAT)\\b"
+        }
+      ]
+    },
+
+    "flags": {
+      "patterns": [
+        {
+          "name": "variable.language.flag.etca",
+          "match": "\\b(Z|N|C|V)\\b"
+        }
+      ]
+    },
+
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.hex.etca",
+          "match": "\\b0x[0-9A-Fa-f]+\\b"
+        },
+        {
+          "name": "constant.numeric.decimal.etca",
+          "match": "\\b-?[0-9]+\\b"
+        }
+      ]
+    }
+  }
+}
