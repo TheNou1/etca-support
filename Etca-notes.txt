@@ -1,0 +1,69 @@
+
+
+- Package.json tells VsCode what the extension is/does.
+    - The name - engines block just names the project and its description in marketplace
+
+    - The vscode : ^xxx tells vscode to only load the extension on vscode versions equal or later than xxx. 
+            prevents mismatch API crashes
+
+    - categories is aesthetic for marketplace
+
+    - Activation tells vscode when to run code
+        - activationEvents is [] rn which means vscode will run based on 
+            - contributed commands and 
+            - contributed languages 
+        - Don't need to specify events manually since contributions will trigger activation
+     
+    - Contributes is the most important part 
+        - id - configuration let .etca files be recognised as such
+        - grammars does syntax highlighting; makes registers, opcodes, numbers colored.
+        - Commands tells vscode there IS a etca.runProgram that EXISTS but it does NOT implement it 
+            - implementation in extension.ts
+        - Menus tells vscode to make a play button appear onscreen when opening .etca files 
+
+    - Scripts has terminal commands for dev
+    
+    - devdependencies are for building extension
+
+- Extension.ts is what VsCode actually executes
+    - import statement lets us actually talk to VsCode
+
+    - export activates the extension when a command is ran (etca.runProgram later, helloWorld)
+
+    - Console.log   0_0
+
+    - "const disposable.." connects commands to code
+        - rn does nothing but supposed to find the .etca, run assembler, and output on terminal
+
+    - context.subscriptions.push(disposable) tells vscode to get rid of commands once extension unloaded
+
+    - deactivate deactivates the extension  :D
+
+- tsconfig.json makes the code runnable
+    - tells the compiler how to turn src/extension.ts  to  out/extension.js
+
+    - "rootDir": "src" is where the typescript is 
+
+    - "outDir": "out" is where the compiled javascript goes 
+
+        - has to match "main": "./out/extension.js" in Package.json
+
+    - "module": "Node16" tells vscode to generate js that works in node.js
+
+    - "target": "ES2022" which modern js featured are allowed: Async/await, modern syntax, etc.
+
+    - "sourceMap": true allows for debugging of typescript while javascript runs
+
+    - "strict": true forces typescript discipline, not allowing undefined types 
+
+    commeand architecture pipeline 
+    
+    npm run compile 
+
+    tsconfig.json rules
+        ↓
+    tsc reads src/
+        ↓
+    writes JS into out/
+        ↓
+    VS Code runs that JS    

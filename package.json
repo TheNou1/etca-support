@@ -26,9 +26,28 @@
     "scopeName": "source.etca",
     "path": "./syntaxes/etca.tmLanguage.json"
   }
-]
+],
+"commands": [
+      {
+        "command": "etca.runProgram",
+        "title": "Run ETCA Program",
+        "icon": "$(play)" 
+      }
+    ],
+    "menus": {
+      "editor/title/run": [
+        {
+          "when": "resourceLangId == etca",
+          "command": "etca.runProgram",
+          "group": "navigation"
+        }
+      ]
+    }
 
   },
+
+
+
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
