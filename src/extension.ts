@@ -1,26 +1,71 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import { exec } from 'child_process';
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
+//creates a dedicated output channel for ETCA: used for logging the execution process, 
+// including any errors or warnings from the assembler and the output from the simulator. 
+// This allows users to see all relevant information in one place without cluttering the terminal or other output channels.
+let etcaOutputChannel: vscode.OutputChannel;
+
 export function activate(context: vscode.ExtensionContext) {
+    //initializes the output channel
+    etcaOutputChannel = vscode.window.createOutputChannel('ETCA execution');
+    
+    let runCommand = vscode.commands.registerCommand('etca.runProgram', async () => {
+        const editor = vscode.window.activeTextEditor;
+        
+        if (!editor) {
+            vscode.window.showErrorMessage('No active ETCA file to run.');
+            return;
+        }
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "etca-support" is now active!');
+        const document = editor.document;
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('etca-support.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from etca-support!');
-	});
+        // auto-save  file before running
+        if (document.isDirty) {
+            await document.save();
+        }
 
-	context.subscriptions.push(disposable);
+        const filePath = document.uri.fsPath;
+        
+        // TODO: Replace 'etca-cli' with your actual assembler/simulator command.
+        // For production, you might want to read this path from VS Code workspace settings.
+        const command = `etca-cli run "${filePath}"`;
+
+        // Focus the output channel and clear previous runs
+        etcaOutputChannel.show(true);
+        etcaOutputChannel.clear();
+        etcaOutputChannel.appendLine(`[Running] ${command}\n`);
+
+        // Execute the CLI tool
+        exec(command, (error, stdout, stderr) => {
+            if (error) {
+                etcaOutputChannel.appendLine(`[Process Error] Execution failed: ${error.message}`);
+                // If the assembler throws a non-zero exit code, the errors usually live in stderr
+                if (stderr) {
+                    etcaOutputChannel.appendLine(`[Assembler Diagnostics]:\n${stderr}`);
+                }
+                return;
+            }
+
+            // Print standard warnings/errors
+            if (stderr) {
+                etcaOutputChannel.appendLine(`[Warnings/Errors]:\n${stderr}`);
+            }
+
+            // Print standard output (the simulator result)
+            etcaOutputChannel.appendLine(`[Output]:\n${stdout}`);
+            etcaOutputChannel.appendLine(`\n[Finished]`);
+        });
+    });
+
+    // Register disposables so VS Code cleans them up when the extension is deactivated
+    context.subscriptions.push(runCommand);
+    context.subscriptions.push(etcaOutputChannel);
 }
 
-// This method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() {
+    // Optional clean up
+    if (etcaOutputChannel) {
+        etcaOutputChannel.dispose();
+    }
+}
